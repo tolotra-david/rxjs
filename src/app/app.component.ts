@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, interval } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+  private subscription: any;
   ngOnInit(): void {
     const observer = {
       next: (item: unknown) => console.log(`Une boite arrive ${item}`),
@@ -15,9 +16,10 @@ export class AppComponent implements OnInit {
     };
     const stream = new Observable(myObserver => {
       myObserver.next('Boite 1');
+      myObserver.error(new Error());
       myObserver.next('Boite 2');
-      myObserver.next('Boite 3');
       myObserver.complete();
+      myObserver.next('Boite 3');
     });
 
     const subscription = stream.subscribe(
@@ -25,5 +27,19 @@ export class AppComponent implements OnInit {
       err => console.log(`Erreur ${err}`),
       () => console.log(`terminé... plus rien`)
     );
+
+    subscription.unsubscribe();
+  }
+
+  public start(): void {
+    this.subscription = interval(1000).subscribe(
+      value => console.log('Ma valeur ', value),
+      error => console.log(error),
+      () => console.log('Terminé')
+    );
+  }
+
+  public stop(): void {
+    this.subscription.unsubscribe();
   }
 }
