@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable, interval } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable, interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
-  private subscription: any;
+export class AppComponent implements OnInit, OnDestroy {
+  private subscription: Subscription = new Subscription();
   ngOnInit(): void {
     const observer = {
       next: (item: unknown) => console.log(`Une boite arrive ${item}`),
@@ -27,19 +27,26 @@ export class AppComponent implements OnInit {
       err => console.log(`Erreur ${err}`),
       () => console.log(`terminé... plus rien`)
     );
-
-    subscription.unsubscribe();
   }
 
   public start(): void {
-    this.subscription = interval(1000).subscribe(
+    this.subscription.add(interval(1000).subscribe(
       value => console.log('Ma valeur ', value),
       error => console.log(error),
       () => console.log('Terminé')
-    );
+    ));
+    this.subscription.add(interval(1000).subscribe(
+      value => console.warn('= Ma valeur =', value),
+      error => console.log(error),
+      () => console.warn('= Terminé =')
+    ));
   }
 
   public stop(): void {
+    this.subscription.unsubscribe();
+  }
+
+  ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
 }
