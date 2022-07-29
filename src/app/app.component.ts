@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, interval, Subscription } from 'rxjs';
+import { Observable, interval, Subscription, of, from } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -27,6 +27,14 @@ export class AppComponent implements OnInit, OnDestroy {
       err => console.log(`Erreur ${err}`),
       () => console.log(`terminé... plus rien`)
     );
+
+    subscription.unsubscribe()
+    of(1,2,3,4).subscribe(console.log)
+    from([12, 13, 14, 15]).subscribe(
+      (item:number) => console.log(`Ma valeur ${item}`),
+      (err: unknown) => console.log(err),
+      () => console.log('terminé')
+    )
   }
 
   public start(): void {
