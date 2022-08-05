@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, interval, Subscription, of, from } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { map, tap, take } from 'rxjs/operators';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -19,7 +19,8 @@ export class AppComponent implements OnInit, OnDestroy {
           }
           return elem * 2;
         }),
-        map(item => item - 2)
+        map(item => item - 2),
+        take(2)
       )
       .subscribe(
         (item: number) => console.log(`Ma valeur ${item}`),
