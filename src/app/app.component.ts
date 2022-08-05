@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, interval, Subscription, of, from } from 'rxjs';
-
+import { map } from 'rxjs/operators';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -9,50 +9,22 @@ import { Observable, interval, Subscription, of, from } from 'rxjs';
 export class AppComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
   ngOnInit(): void {
-    const observer = {
-      next: (item: unknown) => console.log(`Une boite arrive ${item}`),
-      error: (err: unknown) => console.log(`Oups il y a eu une erreur ${err}`),
-      complete: () => console.log(`terminé... plus rien`)
-    };
-    const stream = new Observable(myObserver => {
-      myObserver.next('Boite 1');
-      myObserver.error(new Error());
-      myObserver.next('Boite 2');
-      myObserver.complete();
-      myObserver.next('Boite 3');
-    });
 
-    const subscription = stream.subscribe(
-      item => console.log(`Une boite arrive ${item}`),
-      err => console.log(`Erreur ${err}`),
-      () => console.log(`terminé... plus rien`)
-    );
-
-    subscription.unsubscribe();
-
-    // from([12, 13, 14, 15]).subscribe(
-    //   (item:number) => console.log(`Ma valeur ${item}`),
-    //   (err: unknown) => console.log(err),
-    //   () => console.log('terminé')
-    // )
-
-    const double = (source: Observable<number>) =>
-      new Observable<number>((subscriber) => {
-        const subscription = source.subscribe({
-          next: (value) => subscriber.next(2 * value),
-          error: (err) => subscriber.error(err),
-          complete: () => subscriber.complete()
-        });
-        return () => {
-          subscription.unsubscribe();
-        };
-      });
-    of(1, 2, 3, 4)
+    from([1, 2, 12, 13, 14, 0, 15])
       .pipe(
-        double,
-        double)
-      .subscribe(console.log);
-
+        map((elem: number) => {
+          if (elem == 0) {
+            throw new Error('zero erreur');
+          }
+          return elem * 2;
+        }),
+        map(item => item - 2)
+      )
+      .subscribe(
+        (item: number) => console.log(`Ma valeur ${item}`),
+        (err: unknown) => console.log(err),
+        () => console.log('terminé')
+      );
 
   }
 
